@@ -15,7 +15,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   FormControl,
   InputLabel,
   Select,
@@ -33,19 +32,11 @@ import {
 import { useNanobotStore } from '../stores/nanobotStore'
 import { BotConfigDialog } from './BotConfigDialog'
 
-const AVAILABLE_MODELS = [
-  { value: 'anthropic/claude-3-5-sonnet', label: 'Claude 3.5 Sonnet' },
-  { value: 'anthropic/claude-3-opus', label: 'Claude 3 Opus' },
-  { value: 'openai/gpt-4o', label: 'GPT-4o' },
-  { value: 'deepseek/deepseek-chat', label: 'DeepSeek Chat' },
-]
-
 export const BotList: React.FC = () => {
   const {
     currentProjectId,
     projectBots,
     bots,
-    addBot,
     removeBot,
     toggleBot,
     assignBotToProject,
@@ -53,13 +44,6 @@ export const BotList: React.FC = () => {
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [configuringBot, setConfiguringBot] = useState<string | null>(null)
-
-  // 添加 Bot 表单状态
-  const [newBotName, setNewBotName] = useState('')
-  const [newBotDescription, setNewBotDescription] = useState('')
-  const [newBotModel, setNewBotModel] = useState('anthropic/claude-3-5-sonnet')
-  const [isAdding, setIsAdding] = useState(false)
-  const [addError, setAddError] = useState<string | null>(null)
   const [selectedBotId, setSelectedBotId] = useState('')
 
   const currentBotIds = currentProjectId ? projectBots.get(currentProjectId) || [] : []
@@ -69,24 +53,6 @@ export const BotList: React.FC = () => {
   const availableBots = Array.from(bots.values()).filter(
     bot => bot.is_active && !currentBotIds.includes(bot.id)
   )
-
-  const handleAddBot = async () => {
-    if (!currentProjectId || !newBotName.trim()) return
-
-    setIsAdding(true)
-    setAddError(null)
-
-    try {
-      await addBot(currentProjectId, newBotName.trim(), newBotDescription, newBotModel)
-      setIsAddDialogOpen(false)
-      setNewBotName('')
-      setNewBotDescription('')
-    } catch (err: any) {
-      setAddError(err.message || '添加失败')
-    } finally {
-      setIsAdding(false)
-    }
-  }
 
   // 处理从下拉列表选择并添加 Bot
   const handleSelectAndAddBot = () => {
@@ -254,12 +220,6 @@ export const BotList: React.FC = () => {
       <Dialog open={isAddDialogOpen} onClose={() => setIsAddDialogOpen(false)} maxWidth="xs" fullWidth>
         <DialogTitle>添加数字员工</DialogTitle>
         <DialogContent>
-          {addError && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {addError}
-            </Alert>
-          )}
-
           {availableBots.length === 0 ? (
             <Box sx={{ textAlign: 'center', py: 3 }}>
               <Typography variant="body2" color="text.secondary">

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
-import { Users, CheckCircle2, Clock, FileText, Loader2, Check, X, FileOutput, Play, Settings } from 'lucide-react'
+import { Users, FileText, Loader2, Check, X, FileOutput, Play, Settings, Plus } from 'lucide-react'
 import { useStore } from '../stores/appStore'
 import { useNanobotStore } from '../stores/nanobotStore'
 import TaskCard from './TaskCard'
 import AgentMemberList from './AgentMemberList'
-import type { Task, Deliverable } from '../types'
+import type { Deliverable } from '../types'
 
 interface AgentGroupPanelProps {
   sessionId: string
@@ -16,7 +16,6 @@ export default function AgentGroupPanel({ sessionId, projectId }: AgentGroupPane
     bots: appBots,
     tasks,
     sessions,
-    currentSessionId,
     agentGroups,
     addAgentGroup,
     addBotToGroup,
@@ -43,7 +42,7 @@ export default function AgentGroupPanel({ sessionId, projectId }: AgentGroupPane
     if (!agentGroup && sessionId && projectId) {
       // 自动创建 Agent Group
       const session = sessions.find(s => s.id === sessionId)
-      const masterBot = allBots.find(b => b.role === 'master') || allBots[0]
+      const masterBot = allBots.find((b: any) => b.role === 'master') || allBots[0]
 
       if (session) {
         addAgentGroup({
@@ -70,7 +69,7 @@ export default function AgentGroupPanel({ sessionId, projectId }: AgentGroupPane
   const deliverables = sessionTasks.flatMap(t => t.deliverables)
 
   // 获取可用 bots（不在群里的）
-  const availableBots = allBots.filter(b =>
+  const availableBots = allBots.filter((b: any) =>
     (b.enabled ?? b.is_active) && !agentGroup?.botIds.includes(b.id)
   )
 
@@ -98,7 +97,7 @@ export default function AgentGroupPanel({ sessionId, projectId }: AgentGroupPane
     )
   }
 
-  const masterBot = allBots.find(b => b.id === agentGroup.masterBotId)
+  const masterBot = allBots.find((b: any) => b.id === agentGroup.masterBotId)
 
   return (
     <div className="w-[320px] h-full bg-[#f9fafb] border-l border-gray-200 flex flex-col">
@@ -208,7 +207,6 @@ export default function AgentGroupPanel({ sessionId, projectId }: AgentGroupPane
 
         {activeTab === 'members' && (
           <AgentMemberList
-            groupId={agentGroup.id}
             botIds={agentGroup.botIds}
             masterBotId={agentGroup.masterBotId}
             onAddBot={() => setShowAddBotModal(true)}
@@ -264,19 +262,19 @@ export default function AgentGroupPanel({ sessionId, projectId }: AgentGroupPane
               {availableBots.length === 0 ? (
                 <p className="text-sm text-gray-400 text-center py-4">没有可添加的 Agent</p>
               ) : (
-                availableBots.map(bot => (
+                availableBots.map((bot: any) => (
                   <button
                     key={bot.id}
-                    onClick={() => handleAddBot(bot.id)}
+                    onClick={() => bot && handleAddBot(bot.id)}
                     className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors text-left"
                   >
                     <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center text-white text-sm font-medium">
-                      {bot.name[0]}
+                      {bot?.name[0]}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <span className="text-sm font-medium text-gray-800 block truncate">{bot.name}</span>
+                      <span className="text-sm font-medium text-gray-800 block truncate">{bot?.name}</span>
                       <span className="text-xs text-gray-400 truncate">
-                        {bot.skills.slice(0, 2).join('、')}
+                        {bot?.skills?.slice(0, 2).join('、')}
                       </span>
                     </div>
                     <Plus className="w-4 h-4 text-gray-300" />

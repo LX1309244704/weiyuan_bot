@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { Phone, Video, MoreHorizontal, Smile, Image as ImageIcon, Folder, Send, Sparkles, Loader2, CheckCircle2, Bot, AtSign } from 'lucide-react'
 import { useStore } from '../stores/appStore'
+import { useNanobotStore } from '../stores/nanobotStore'
 import TaskCreationModal from './TaskCreationModal'
 import type { Message } from '../types'
 import { getCurrentMentionText, replaceMention } from '../utils/mentionParser'
@@ -88,13 +89,25 @@ export default function QQChatArea() {
   const { 
     messages, 
     addMessage, 
-    bots, 
+    bots: appBots, 
     currentSessionId, 
     sessions, 
     currentProjectId,
     tasks,
     isTaskProcessing 
   } = useStore()
+  
+  const {
+    bots: nanobotBots,
+    projectBots: nanobotProjectBots,
+    loadAllBots,
+  } = useNanobotStore()
+  
+  // 加载所有 bots
+  useEffect(() => {
+    loadAllBots()
+  }, [])
+  
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showTaskModal, setShowTaskModal] = useState(false)
@@ -106,9 +119,18 @@ export default function QQChatArea() {
   const mentionStartPos = useRef<number>(-1)
 
   const currentSession = sessions.find(s => s.id === currentSessionId)
-  const sessionBots = currentSession 
-    ? bots.filter(b => currentSession.botIds.includes(b.id))
-    : []
+  
+  // 优先使用 nanobotStore 的数据
+  let sessionBots: any[] = []
+  if (currentProjectId) {
+    const projectBotIds = nanobotProjectBots.get(currentProjectId) || []
+    sessionBots = projectBotIds.map(id => nanobotBots.get(id)).filter(Boolean)
+  }
+  // 如果没有 nanobot 数据，回退到 appStore
+  if (sessionBots.length === 0 && currentSession) {
+    sessionBots = appBots.filter(b => currentSession.botIds.includes(b.id))
+  }
+  
   const primaryBot = sessionBots[0]
   const masterBot = sessionBots.find(b => b.role === 'master') || primaryBot
 
@@ -383,7 +405,7 @@ export default function QQChatArea() {
                   }`}>
                     <span className="text-white text-sm font-medium">
                       {isUser ? '我' : msg.botId 
-                        ? bots.find(b => b.id === msg.botId)?.name[0] || 'B'
+                        ? sessionBots.find((b: any) => b.id === msg.botId)?.name[0] || 'B'
                         : 'B'}
                     </span>
                   </div>
@@ -391,7 +413,7 @@ export default function QQChatArea() {
                     {/* Bot 名称 */}
                     {!isUser && msg.botId && (
                       <span className="text-xs text-gray-400 mb-1 ml-1">
-                        {bots.find(b => b.id === msg.botId)?.name || 'Bot'}
+                        {sessionBots.find((b: any) => b.id === msg.botId)?.name || 'Bot'}
                       </span>
                     )}
                     <div className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${

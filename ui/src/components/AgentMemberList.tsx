@@ -1,9 +1,7 @@
-import { useState } from 'react'
-import { Plus, X, Bot, User, Crown, MoreVertical } from 'lucide-react'
+import { Plus, X, Crown } from 'lucide-react'
 import { useStore } from '../stores/appStore'
 
 interface AgentMemberListProps {
-  groupId: string
   botIds: string[]
   masterBotId: string
   onAddBot?: () => void
@@ -11,14 +9,12 @@ interface AgentMemberListProps {
 }
 
 export default function AgentMemberList({
-  groupId,
   botIds,
   masterBotId,
   onAddBot,
   onRemoveBot,
 }: AgentMemberListProps) {
   const { bots } = useStore()
-  const [showMenu, setShowMenu] = useState<string | null>(null)
 
   const groupBots = bots.filter(b => botIds.includes(b.id))
   const masterBot = groupBots.find(b => b.id === masterBotId)

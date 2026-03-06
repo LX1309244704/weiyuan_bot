@@ -5,7 +5,6 @@
 
 import type {
   TaskDecomposition,
-  NanobotSubagentTask,
   BotSkillMatch,
 } from '../types'
 
@@ -120,7 +119,7 @@ export async function sendMessage(
 
 function mockDecomposeTask(
   taskDescription: string,
-  availableBots: Array<{ id: string; name: string; skills: string[] }>
+  _availableBots: Array<{ id: string; name: string; skills: string[] }>
 ): TaskDecomposition {
   const desc = taskDescription.toLowerCase()
   let subTasks = []

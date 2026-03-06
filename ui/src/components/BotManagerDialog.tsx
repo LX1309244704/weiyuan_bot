@@ -29,8 +29,6 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
-  Checkbox,
-  FormControlLabel,
   Divider,
 } from '@mui/material'
 import {
@@ -42,8 +40,6 @@ import {
   CheckCircle as CheckIcon,
   AddCircle as AddCircleIcon,
   RemoveCircle as RemoveCircleIcon,
-  Settings as SettingsIcon,
-  Edit as EditIcon,
 } from '@mui/icons-material'
 import { useNanobotStore, Bot } from '../stores/nanobotStore'
 

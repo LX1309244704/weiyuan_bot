@@ -24,7 +24,7 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material'
-import { useNanobotStore, Bot, Skill } from '../stores/nanobotStore'
+import { useNanobotStore, Bot } from '../stores/nanobotStore'
 
 interface BotConfigDialogProps {
   open: boolean
